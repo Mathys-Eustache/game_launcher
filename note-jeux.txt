@@ -1,0 +1,5 @@
+voir l'apercu de la colone de carte avec la couleur et le signe 
+-animation de glissement
+-rajouter un bouton bloquer
+-une fois gagné avoir un bouton ranger automatiquement les cartes pour pouvoir faire une nouvelle partie
+- bouton dans le jeux pour revenir au menu

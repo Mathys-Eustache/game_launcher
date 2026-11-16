@@ -1,0 +1,4 @@
+# On dit à Wails d'ignorer ces dossiers lors de la compilation
+build/
+frontend/dist/
+frontend/node_modules/

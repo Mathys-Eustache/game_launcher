@@ -1,0 +1,118 @@
+/* 
+   Fichier principal de style (CSS).
+   Il gère l'apparence de toute l'application pour la rendre accessible 
+   aux personnes âgées (gros textes, forts contrastes).
+*/
+
+body {
+    /* Supprime les marges par défaut du navigateur */
+    margin: 0;
+    
+    /* Couleur de fond douce pour ne pas agresser les yeux */
+    background-color: #f4f7f6;
+    
+    /* Police d'écriture classique et très lisible */
+    font-family: 'Arial', sans-serif;
+    
+    /* Très important : empêche de surligner le texte si la personne clique à côté d'un bouton */
+    user-select: none; 
+}
+
+/* Le conteneur qui englobe tout le menu */
+.menu-container {
+    /* Utilise Flexbox pour aligner les éléments facilement */
+    display: flex;
+    /* Aligne les éléments de haut en bas (en colonne) */
+    flex-direction: column;
+    /* Centre les éléments horizontalement */
+    align-items: center;
+    /* Centre les éléments verticalement */
+    justify-content: center;
+    /* Prend 100% de la hauteur de la fenêtre */
+    height: 100vh;
+    /* Espace bien large (30 pixels) entre chaque bouton pour éviter les erreurs de clic */
+    gap: 30px; 
+}
+
+/* Style du grand titre "Mes Jeux" */
+.titre {
+    font-size: 4rem; /* Texte énorme */
+    color: #2c3e50; /* Gris/Bleu très foncé pour un bon contraste */
+    margin-bottom: 20px; /* Espace sous le titre */
+}
+
+/* Le style de base pour tous nos gros boutons */
+.gros-bouton {
+    font-size: 3rem; /* Police géante à l'intérieur du bouton */
+    padding: 30px; /* Espace à l'intérieur du bouton pour le rendre épais */
+    border-radius: 20px; /* Bords arrondis pour un aspect plus doux */
+    border: none; /* Supprime la bordure par défaut */
+    cursor: pointer; /* Transforme la souris en petite main au survol */
+    width: 80%; /* Le bouton prend 80% de la largeur de l'écran... */
+    max-width: 700px; /* ...mais ne dépasse jamais 700 pixels pour rester joli */
+    font-weight: bold; /* Texte en gras */
+    /* Ajoute une légère ombre sous le bouton pour donner un effet de volume */
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    /* Prépare une petite animation fluide de 0.1 seconde */
+    transition: transform 0.1s;
+    
+    /* Flexbox à l'intérieur du bouton pour bien aligner l'emoji et le texte */
+    display: flex;
+    justify-content: center; /* Centre le texte */
+    align-items: center;
+    gap: 20px; /* Espace entre l'emoji et le texte */
+}
+
+/* Effet visuel quand la personne clique (maintient le clic) sur le bouton */
+.gros-bouton:active {
+    /* Réduit légèrement la taille du bouton pour donner une sensation de clic physique */
+    transform: scale(0.98); 
+}
+
+/* Couleurs spécifiques et contrastées pour chaque jeu */
+.btn-mahjong { background-color: #27ae60; color: white; } /* Vert */
+.btn-mots { background-color: #2980b9; color: white; } /* Bleu */
+.btn-solitaire { background-color: #f39c12; color: white; } /* Orange */
+
+/* Le bouton quitter est séparé des autres par un grand espace (margin-top) et coloré en rouge */
+.btn-quitter { background-color: #e74c3c; color: white; margin-top: 40px; }
+
+/* --- GESTION DES THÈMES --- */
+.app-wrapper {
+    min-height: 100vh;
+    width: 100vw;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.theme-clair {
+    background-color: #f5f6fa;
+    color: #2f3640;
+}
+
+.theme-sombre {
+    background-color: #2f3640;
+    color: #f5f6fa;
+}
+
+.btn-theme {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 12px;
+    border: 3px solid #718093;
+    background-color: transparent;
+    color: inherit; /* S'adapte au thème actuel */
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-theme:hover {
+    transform: scale(1.05);
+    border-color: #00a8ff;
+}
