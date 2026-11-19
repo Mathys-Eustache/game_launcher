@@ -5,9 +5,8 @@ from board import PlateauMahjong
 BG_COLOR = "#2c3e50"
 TILE_W = 60
 TILE_H = 72
-OFFSET_X = 212
-OFFSET_Y = 110
 Z_SHIFT = 6  # Décalage visuel 3D entre les étages
+
 
 class MahjongGame(tk.Tk):
     def __init__(self):
@@ -22,6 +21,15 @@ class MahjongGame(tk.Tk):
         self.plateau = PlateauMahjong()
         self.selected_tile = None
         self.hint_pair = []
+        self.secondes = 0
+        self.timer_running = False
+        self.timer_id = None
+
+        self.lbl_chrono = tk.Label(
+            self, text="⏱️ 00:00", font=("Arial", 16, "bold"),
+            bg=BG_COLOR, fg="white"
+        )
+        self.lbl_chrono.place(relx=0.5, y=25, anchor="n")
 
         # --- BOUTONS ---
         self.btn_restart = tk.Button(
@@ -43,10 +51,10 @@ class MahjongGame(tk.Tk):
             highlightbackground="#e74c3c", padx=12, pady=6
         )
         self.btn_menu.place(x=385, y=20)
+        self.btn_menu.pack(side=tk.RIGHT, padx=10, pady=5)
         
-
         self.lbl_restantes = tk.Label(
-            self, text="Tuiles restantes : 144", font=("Arial", 18, "bold"),
+            self, text="Tuiles restantes : 136", font=("Arial", 18, "bold"),
             bg=BG_COLOR, fg="white"
         )
         self.lbl_restantes.place(relx=0.98, y=25, anchor="ne")
@@ -56,14 +64,44 @@ class MahjongGame(tk.Tk):
             command=self.init_game, bg="#e74c3c", fg="white"
         )
 
+        self.canvas.bind("<ButtonPress-1>", self.on_click)
         self.canvas.bind("<Configure>", lambda event: self.draw_board())
         self.draw_board()
+
+    def demarrer_chrono(self):
+        """Remet le chrono à zéro et le lance."""
+        if self.timer_id:
+            self.after_cancel(self.timer_id)
+        self.secondes = 0
+        self.timer_running = True
+        self.lbl_chrono.config(text="⏱️ 00:00")
+        self.mettre_a_jour_chrono()
+
+    def mettre_a_jour_chrono(self):
+        """Ajoute 1 seconde toutes les 1000 ms."""
+        if not self.timer_running:
+            return
+        minutes = self.secondes // 60
+        sec = self.secondes % 60
+        self.lbl_chrono.config(text=f"⏱️ {minutes:02d}:{sec:02d}")
+        self.secondes += 1
+        self.timer_id = self.after(1000, self.mettre_a_jour_chrono)
+
+    def arreter_chrono(self):
+        """Met le chrono en pause (victoire ou partie bloquée)."""
+        self.timer_running = False
+        if self.timer_id:
+            self.after_cancel(self.timer_id)
+            self.timer_id = None
 
     def init_game(self):
         self.btn_relancer_fin.place_forget()
         self.canvas.delete("end_ui")
         self.selected_tile = None
         self.hint_pair = []
+        self.arreter_chrono()
+        self.secondes = 0
+        self.lbl_chrono.config(text="⏱️ 00:00")
         self.plateau = PlateauMahjong()
         self.draw_board()
 
@@ -93,9 +131,8 @@ class MahjongGame(tk.Tk):
         if w <= 1:
             w, h = 1024, 768
 
-        # La base fait 10 tuiles de large et 8 tuiles de haut
         offset_x = (w - 10 * TILE_W) / 2
-        offset_y = (h - 8 * TILE_H) / 2 + 25  # +25 pour laisser la place aux boutons en haut
+        offset_y = (h - 8 * TILE_H) / 2 + 25
 
         x = offset_x + tuile.x * TILE_W - tuile.z * Z_SHIFT
         y = offset_y + tuile.y * TILE_H - tuile.z * Z_SHIFT
@@ -106,20 +143,17 @@ class MahjongGame(tk.Tk):
         tuiles_actives = [t for t in self.plateau.tuiles if t.active]
         self.lbl_restantes.config(text=f"Tuiles restantes : {len(tuiles_actives)}")
 
-        # Tri par étage (z), puis ligne (y), puis colonne (x) pour un rendu 3D propre
         tuiles_triees = sorted(tuiles_actives, key=lambda t: (t.z, t.y, t.x))
 
         for t in tuiles_triees:
             x, y = self.get_tile_coords(t)
             libre = self.plateau.est_tuile_libre(t)
 
-            # Ombre / épaisseur 3D en bas et à droite
             self.canvas.create_rectangle(
                 x + 4, y + 4, x + TILE_W + 4, y + TILE_H + 4,
                 fill="#7f8c8d", outline="#2c3e50", tags="tile"
             )
 
-            # Couleur de fond et bordure selon l'état
             if t == self.selected_tile:
                 bg_tile = "#fef9e7"
                 outline_col = "#f1c40f"
@@ -133,7 +167,6 @@ class MahjongGame(tk.Tk):
                 outline_col = "#2c3e50"
                 width = 1
 
-            # Face de la tuile
             self.canvas.create_rectangle(
                 x, y, x + TILE_W, y + TILE_H,
                 fill=bg_tile, outline=outline_col, width=width, tags="tile"
@@ -141,12 +174,10 @@ class MahjongGame(tk.Tk):
 
             symbole, valeur, couleur = self.get_tile_style(t.type_tuile)
 
-            # Numéro / Lettre en haut
             self.canvas.create_text(
                 x + TILE_W / 2, y + 18,
                 text=valeur, font=("Arial", 16, "bold"), fill=couleur, tags="tile"
             )
-            # Symbole au centre-bas
             self.canvas.create_text(
                 x + TILE_W / 2, y + 48,
                 text=symbole, font=("Arial", 22), fill=couleur, tags="tile"
@@ -169,8 +200,9 @@ class MahjongGame(tk.Tk):
 
     def verifier_etat_partie(self):
         tuiles_actives = [t for t in self.plateau.tuiles if t.active]
-        
+
         if not tuiles_actives:
+            self.arreter_chrono()
             self.canvas.create_rectangle(212, 284, 812, 484, fill="#27ae60", outline="white", width=4, tags="end_ui")
             self.canvas.create_text(
                 512, 350,
@@ -181,6 +213,7 @@ class MahjongGame(tk.Tk):
             return
 
         if not self.trouver_paire_disponible():
+            self.arreter_chrono()
             self.canvas.create_rectangle(212, 284, 812, 484, fill="#34495e", outline="white", width=4, tags="end_ui")
             self.canvas.create_text(
                 512, 350,
@@ -190,8 +223,10 @@ class MahjongGame(tk.Tk):
             self.btn_relancer_fin.place(relx=0.5, rely=0.56, anchor="center")
 
     def on_click(self, event):
+        if not self.timer_running and self.secondes == 0:
+            self.demarrer_chrono()
+
         tuiles_actives = [t for t in self.plateau.tuiles if t.active]
-        # On parcourt dans l'ordre inverse du dessin pour cliquer la tuile la plus haute
         tuiles_triees = sorted(tuiles_actives, key=lambda t: (t.z, t.y, t.x), reverse=True)
 
         tuile_cliquee = None
@@ -206,11 +241,10 @@ class MahjongGame(tk.Tk):
             self.draw_board()
             return
 
-        # Si la tuile est bloquée, on ignore le clic
         if not self.plateau.est_tuile_libre(tuile_cliquee):
             return
 
-        self.hint_pair = []  # On efface l'indice dès que le joueur clique
+        self.hint_pair = []
 
         if self.selected_tile is None:
             self.selected_tile = tuile_cliquee
@@ -223,10 +257,10 @@ class MahjongGame(tk.Tk):
                 self.verifier_etat_partie()
                 return
             else:
-                # Si les deux tuiles ne correspondent pas, on sélectionne la nouvelle
                 self.selected_tile = tuile_cliquee
 
         self.draw_board()
+
 
 if __name__ == "__main__":
     app = MahjongGame()
