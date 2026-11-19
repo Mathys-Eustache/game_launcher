@@ -5,17 +5,21 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 )
 
 func (a *App) runPythonGame(gameFolder string) {
 	scriptPath := filepath.Join("games_logic", gameFolder, "engine.py")
 
-	// On affiche le chemin exact que Go essaie d'utiliser
 	fmt.Printf("🔍 Tentative d'ouverture du fichier : %s\n", scriptPath)
 
-	cmd := exec.Command("python", scriptPath)
+	pythonCmd := "python3"
+	if runtime.GOOS == "windows" {
+		pythonCmd = "python"
+	}
 
-	// 🔴 LA MODIFICATION MAGIQUE : On dit à Go d'afficher les erreurs de Python dans notre terminal
+	cmd := exec.Command(pythonCmd, scriptPath)
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -28,7 +32,6 @@ func (a *App) runPythonGame(gameFolder string) {
 	fmt.Printf("✅ Commande envoyée avec succès pour %s !\n", gameFolder)
 }
 
-// ... garde tes fonctions LaunchMahjong, LaunchMotsFleches et LaunchSolitaire en dessous
 func (a *App) LaunchMahjong() {
 	a.runPythonGame("mahjong")
 }
