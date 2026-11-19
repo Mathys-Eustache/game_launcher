@@ -22,6 +22,15 @@ class SolitaireGame(tk.Tk):
         self.selected_source_idx = None
         self.drag_data = None 
         self.is_animating = False
+
+        self.btn_menu = tk.Button(
+            self, text="🏠 Menu", font=("Arial", 16, "bold"),
+            command=self.destroy, bg="#e74c3c", fg="black",
+            activebackground="#c0392b", activeforeground="white",
+            highlightbackground="#e74c3c", padx=12, pady=6
+        )
+        self.btn_menu.place(relx=0.98, y=20, anchor="ne")
+        self.btn_menu.lift()  # Force le bouton au-dessus du tapis de jeu
         
         self.btn_restart = tk.Button(
             self, text="🔄 Nouvelle Partie", font=("Arial", 16, "bold"), 

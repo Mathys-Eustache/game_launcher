@@ -13,6 +13,15 @@ class MotsFlechesGame(tk.Tk):
         
         self.canvas = tk.Canvas(self, bg=BG_COLOR, highlightthickness=0)
         self.canvas.pack(fill=tk.BOTH, expand=True)
+
+        self.btn_menu = tk.Button(
+            self, text="🏠 Menu", font=("Arial", 16, "bold"),
+            command=self.destroy, bg="#e74c3c", fg="black",
+            activebackground="#c0392b", activeforeground="white",
+            highlightbackground="#e74c3c", padx=12, pady=6
+        )
+        self.btn_menu.place(relx=0.98, y=20, anchor="ne")
+        self.btn_menu.pack(side=tk.RIGHT, padx=10, pady=5)
         
         # --- CRÉATION DES 3 BOUTONS ---
         self.btn_restart = tk.Button(
@@ -21,11 +30,11 @@ class MotsFlechesGame(tk.Tk):
         )
         self.btn_reveal_letter = tk.Button(
             self, text="💡 Révéler la case", font=("Arial", 16, "bold"), 
-            command=self.reveal_letter, bg="#3498db", fg="white", padx=10, pady=5
+            command=self.reveal_letter, bg="#3498db", fg="black", padx=10, pady=5
         )
         self.btn_reveal_word = tk.Button(
             self, text="👁️ Révéler le mot", font=("Arial", 16, "bold"), 
-            command=self.reveal_word, bg="#9b59b6", fg="white", padx=10, pady=5
+            command=self.reveal_word, bg="#9b59b6", fg="black", padx=10, pady=5
         )
         
         self.grid_size = 8

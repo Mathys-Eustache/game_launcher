@@ -36,6 +36,15 @@ class MahjongGame(tk.Tk):
         )
         self.btn_hint.place(x=240, y=20)
 
+        self.btn_menu = tk.Button(
+            self, text="🏠 Menu", font=("Arial", 16, "bold"),
+            command=self.destroy, bg="#e74c3c", fg="black",
+            activebackground="#c0392b", activeforeground="white",
+            highlightbackground="#e74c3c", padx=12, pady=6
+        )
+        self.btn_menu.place(x=385, y=20)
+        
+
         self.lbl_restantes = tk.Label(
             self, text="Tuiles restantes : 144", font=("Arial", 18, "bold"),
             bg=BG_COLOR, fg="white"
